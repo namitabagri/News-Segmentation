@@ -18,7 +18,6 @@ st.set_page_config(
 
 # --- Caching Functions for Performance ---
 
-# Cache the data loading
 @st.cache_data
 def load_data():
     """Downloads and loads the BBC news dataset."""
@@ -27,7 +26,6 @@ def load_data():
     return df
 
 
-# Cache the TF-IDF vectorizer object and the vectorized data
 @st.cache_resource
 def vectorize_text(df):
     """Creates and fits a TF-IDF vectorizer, then transforms the text data."""
@@ -42,17 +40,19 @@ def vectorize_text(df):
     return vectorizer, X_text
 
 
-# Cache the main clustering and PCA analysis
+# CORRECTED FUNCTION: The 'X_text' parameter is now '_X_text'
 @st.cache_data
-def run_kmeans_and_pca(_vectorizer, X_text, k=5):
+def run_kmeans_and_pca(_vectorizer, _X_text, k=5):
     """Runs KMeans clustering and PCA dimensionality reduction."""
     # K-Means Clustering
     kmeans = KMeans(n_clusters=k, random_state=42, n_init=10)
-    labels = kmeans.fit_predict(X_text)
+    # Use _X_text here
+    labels = kmeans.fit_predict(_X_text)
 
     # PCA for visualization
     pca = PCA(n_components=2, random_state=42)
-    X_reduced = pca.fit_transform(X_text.toarray())
+    # Use _X_text here
+    X_reduced = pca.fit_transform(_X_text.toarray())
     centers_reduced = pca.transform(kmeans.cluster_centers_)
 
     # Get top words for theme interpretation
@@ -63,7 +63,8 @@ def run_kmeans_and_pca(_vectorizer, X_text, k=5):
         top_words[i] = [terms[j] for j in top_indices]
 
     # Calculate Silhouette Score
-    score = silhouette_score(X_text, labels)
+    # Use _X_text here
+    score = silhouette_score(_X_text, labels)
 
     return labels, X_reduced, centers_reduced, top_words, score
 
